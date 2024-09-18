@@ -97,7 +97,7 @@ if __name__ == "__main__":
     if not arguments.write:
         arguments.write = f"{date.today()} {strftime('%H_%M_%S', localtime())}.txt"
     t1 = time()
-    successful_anonymous_binds = main(arguments.server, arguments.port, arguments.credentials)
+    successful_anonymous_binds = main(arguments.server, arguments.port, arguments.ssl)
     t2 = time()
     display(':', f"Successful Binds = {Back.MAGENTA}{len(successful_anonymous_binds)}{Back.RESET}")
     display(':', f"Time Taken       = {Back.MAGENTA}{t2-t1:.2f} seconds{Back.RESET}")
