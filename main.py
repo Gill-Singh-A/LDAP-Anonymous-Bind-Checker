@@ -1,5 +1,6 @@
 #! /usr/bin/env python3
 
+import ldap3
 from datetime import date
 from optparse import OptionParser
 from colorama import Fore, Back, Style
@@ -27,12 +28,21 @@ def get_arguments(*args):
         parser.add_option(arg[0], arg[1], dest=arg[2], help=arg[3])
     return parser.parse_args()[0]
 
-def checkAnonymousBind(server, port):
-    pass
-def checkAnonymousBind_Handler(thread_index, servers, port):
+def checkAnonymousBind(server, port, use_ssl):
+    t1 = time()
+    try:
+        server = ldap3.Server(server, port=port, use_ssl=use_ssl, get_info=ldap3.ALL)
+        connection =ldap3.Connection(server)
+        bind_status = connection.bind()
+        t2 = time()
+        return bind_status, server.info, t2-t1
+    except Exception as error:
+        t2 = time()
+        return error, '', t2-t1
+def checkAnonymousBind_Handler(thread_index, servers, port, use_ssl):
     successful_binds = {}
     for server in servers:
-        status = checkAnonymousBind(server, port)
+        status = checkAnonymousBind(server, port, use_ssl)
         if status[0] == True:
             successful_binds[server] = status[1]
             with lock:
@@ -44,7 +54,7 @@ def checkAnonymousBind_Handler(thread_index, servers, port):
             with lock:
                 display(' ', f"Thread {thread_index+1}:{status[2]:.2f}s -> {Fore.CYAN}{server}{Fore.RESET} => {Fore.YELLOW}Error Occured : {Back.RED}{status[0]}{Fore.RESET}{Back.RESET}")
     return successful_binds
-def main(servers, port):
+def main(servers, port, use_ssl):
     successful_binds = {}
     thread_count = cpu_count()
     pool = Pool(thread_count)
@@ -53,7 +63,7 @@ def main(servers, port):
     total_servers = len(servers)
     server_divisions = [servers[group*total_servers//thread_count: (group+1)*total_servers//thread_count] for group in range(thread_count)]
     for index, server_division in enumerate(server_divisions):
-        threads.append(pool.apply_async(checkAnonymousBind_Handler, (index, server_division, port, )))
+        threads.append(pool.apply_async(checkAnonymousBind_Handler, (index, server_division, port, use_ssl, )))
     for thread in threads:
         successful_binds.update(thread.get())
     pool.close()
