@@ -102,10 +102,10 @@ if __name__ == "__main__":
     display(':', f"Successful Binds = {Back.MAGENTA}{len(successful_anonymous_binds)}{Back.RESET}")
     display(':', f"Time Taken       = {Back.MAGENTA}{t2-t1:.2f} seconds{Back.RESET}")
     display(':', f"Rate             = {Back.MAGENTA}{len(arguments.server)/(t2-t1):.2f} servers / second{Back.RESET}")
-    display(':', f"Dumping Successful Binds to File {Back.MAGENTA}{arguments.write}{Back.RESET} and Server Information to {Back.MAGENTA}{server_info_directory_name}{Back.RESET}")
+    display(':', f"Dumping Successful Binds to File {Back.MAGENTA}{arguments.write}{Back.RESET} and Server Information to {Back.MAGENTA}{server_info_directory_name}{Back.RESET} directory")
     with open(arguments.write, 'w') as file:
         for server, server_info in successful_anonymous_binds.items():
             file.write(f"{server}\n")
             with open(f"{server_info_directory_name}/{server}", 'w') as info_file:
-                info_file.write(server_info)
-    display('+', f"Dumped Successful Logins to File {Back.MAGENTA}{arguments.write}{Back.RESET} and Server Information to {Back.MAGENTA}{server_info_directory_name}{Back.RESET}")
+                info_file.write(str(server_info))
+    display('+', f"Dumped Successful Logins to File {Back.MAGENTA}{arguments.write}{Back.RESET} and Server Information to {Back.MAGENTA}{server_info_directory_name}{Back.RESET} directory")
