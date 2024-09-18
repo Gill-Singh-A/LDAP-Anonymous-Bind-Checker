@@ -78,7 +78,7 @@ if __name__ == "__main__":
     server_info_directory = Path.mkdir(cwd / server_info_directory_name, exist_ok=True)
     arguments = get_arguments(('-s', "--server", "server", "Target LDAP Servers (seperated by ',' or File Name containing Targets)"),
                               ('-p', "--port", "port", f"Port of Target LDAP Servers (Default={port})"),
-                              ('-s', "--ssl", "ssl", f"Use SSL (True/False, Default={ssl})"),
+                              ('-S', "--ssl", "ssl", f"Use SSL (True/False, Default={ssl})"),
                               ('-w', "--write", "write", "File to Dump Successful Logins (default=current data and time)"))
     if not arguments.server:
         display('-', f"Please specify {Back.YELLOW}Target Server{Back.RESET}")
