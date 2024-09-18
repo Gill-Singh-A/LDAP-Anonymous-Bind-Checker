@@ -75,7 +75,7 @@ if __name__ == "__main__":
     arguments = get_arguments(('-s', "--server", "server", "Target LDAP Servers (seperated by ',' or File Name containing Targets)"),
                               ('-p', "--port", "port", f"Port of Target LDAP Servers (Default={port})"),
                               ('-s', "--ssl", "ssl", f"Use SSL (True/False, Default={ssl})"),
-                              ('-w', "--write", "write", "CSV File to Dump Successful Logins (default=current data and time)"))
+                              ('-w', "--write", "write", "File to Dump Successful Logins (default=current data and time)"))
     if not arguments.server:
         display('-', f"Please specify {Back.YELLOW}Target Server{Back.RESET}")
         exit(0)
@@ -91,4 +91,14 @@ if __name__ == "__main__":
     arguments.port = port if not arguments.port else int(arguments.port)
     arguments.ssl = False if arguments.ssl == "False" else ssl
     if not arguments.write:
-        arguments.write = f"{date.today()} {strftime('%H_%M_%S', localtime())}.csv"
+        arguments.write = f"{date.today()} {strftime('%H_%M_%S', localtime())}.txt"
+    t1 = time()
+    successful_anonymous_binds = main(arguments.server, arguments.port, arguments.credentials)
+    t2 = time()
+    display(':', f"Successful Binds = {Back.MAGENTA}{len(successful_anonymous_binds)}{Back.RESET}")
+    display(':', f"Time Taken       = {Back.MAGENTA}{t2-t1:.2f} seconds{Back.RESET}")
+    display(':', f"Rate             = {Back.MAGENTA}{len(arguments.server)/(t2-t1):.2f} servers / second{Back.RESET}")
+    display(':', f"Dumping Successful Binds to File {Back.MAGENTA}{arguments.write}{Back.RESET}")
+    with open(arguments.write, 'w') as file:
+        file.write('\n'.join(successful_anonymous_binds.keys()))
+    display('+', f"Dumped Successful Logins to File {Back.MAGENTA}{arguments.write}{Back.RESET}")
